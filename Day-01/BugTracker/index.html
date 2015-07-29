@@ -72,7 +72,25 @@
     <script src="moment.js"></script>
 
     <script>
-        var bugTrackerApp = angular.module("bugTrackerApp", []);
+
+        var utils = angular.module("utils",[]);
+        utils.value("defaultTrimLength", 20);
+        utils.filter("trimText", function(defaultTrimLength){
+            return function(data, lengthLimit){
+                lengthLimit = lengthLimit || defaultTrimLength;
+                return data.length < lengthLimit ? data : data.substr(0,lengthLimit) + "...";
+            }
+        });
+
+        utils.value("momentApi", moment);
+        utils.filter("toMoment", function(momentApi){
+            return function(data){
+                return momentApi(data).fromNow();
+            };
+        });
+
+
+        var bugTrackerApp = angular.module("bugTrackerApp", ["utils"]);
 
 
 
@@ -91,8 +109,8 @@
             return Bug;
         });
 
-        bugTrackerApp.factory("bugStorage", function(Bug){
-            var storage = window.localStorage;
+        bugTrackerApp.factory("bugStorage", function(Bug, $window){
+            var storage = $window.localStorage;
             return {
                 getAll : function(){
                     var result = [];
@@ -140,35 +158,29 @@
                     }
             };
 
-
-            $scope.searchBug = {
-                name : undefined,
-                isOpen : undefined
-            };
-
-
-            $scope.filterBug = function(actual, expected){
-                if (typeof $scope.searchBug.isOpen === "undefined") return true;
-                return actual.isClosed === !$scope.searchBug.isOpen;
-            };
         });
 
-        bugTrackerApp.filter("trimText", function(){
-            return function(data, lengthLimit){
-                return data.length < lengthLimit ? data : data.substr(0,lengthLimit) + "...";
-            }
-        });
 
-        bugTrackerApp.filter("toMoment", function(){
-            return function(data){
-                return moment(data).fromNow();
-            };
-        });
 
         bugTrackerApp.filter("toClosedCount", function($filter){
             var builtinFilter = $filter('filter')
             return function(bugs){
                 return builtinFilter(bugs, {isClosed : true}).length;
+            }
+        });
+
+        bugTrackerApp.filter('bugFilter', function($filter){
+            var builtinFilter = $filter('filter');
+
+            return function(bugs, searchBug){
+                var exampleForComparison = {};
+                if (typeof searchBug.isOpen !== "undefined"){
+                    exampleForComparison.isClosed = !searchBug.isOpen;
+                } else {
+                    exampleForComparison.isClosed = undefined;
+                }
+                exampleForComparison.name = searchBug.name;
+                return builtinFilter(bugs, exampleForComparison);
             }
         });
 
@@ -199,7 +211,7 @@
             <input type="button" value="Remove Closed" ng-click="removeClosed()">
             <ol>
                 <li
-                    ng-repeat="bug in bugs | filter:filterBug">
+                    ng-repeat="bug in bugs | bugFilter:searchBug">
                     <div class="bugItem">
                         <h2 ng-class="{closed : bug.isClosed}"
                     ng-click="toggle(bug)">{{bug.name}}</h2>
