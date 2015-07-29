@@ -12,8 +12,8 @@
     3. Toggle the closed status of a bug -> done
     4. Remove closed bugs -> done
     5. Display statistics -> done
-    6. Search for bugs
-    7. Sort the bugs
+    6. Search for bugs -> done
+    7. Sort the bugs ->
     8. Improve the bug title display
     9. Display bug created time
     10. Save the bugs in the server
@@ -71,8 +71,23 @@
                 }).length;
             };
 
+            $scope.searchBug = {
+                name : undefined,
+                isOpen : undefined
+            };
 
-        })
+
+            $scope.filterBug = function(actual, expected){
+                if (typeof $scope.searchBug.isOpen === "undefined") return true;
+                return actual.isClosed === !$scope.searchBug.isOpen;
+            };
+        });
+
+        bugTrackerApp.filter("trimText", function(){
+            return function(data, lengthLimit){
+                return data.length < lengthLimit ? data : data.substr(0,lengthLimit) + "...";
+            }
+        });
 
 
     </script>
@@ -89,9 +104,10 @@
         <div class="search">
             <label for="">Search :</label>
             <input type="text" ng-model="searchBug.name" >
-            <label for="">Closed ?</label>
-            <input type="checkbox" ng-model="searchBug.isClosed">
-            <a href="#" ng-click="searchBug.isClosed = undefined">Show All</a>
+            <label for="">Open ?</label>
+            <!--<input type="checkbox" ng-model="searchBug.isClosed">-->
+            <input type="checkbox" ng-model="searchBug.isOpen">
+            <a href="#" ng-click="searchBug.isOpen = undefined">Show All</a>
         </div>
         
         <div class="list">
@@ -101,10 +117,10 @@
             <input type="button" value="Remove Closed" ng-click="removeClosed()">
             <ol>
                 <li
-                    ng-repeat="bug in bugs | filter:searchBug"
+                    ng-repeat="bug in bugs | filter:filterBug"
                     ng-class="{closed : bug.isClosed}"
                     ng-click="toggle(bug)"
-                >{{bug}}</li>
+                >{{bug.name | trimText:25}}</li>
             </ol>
         </div>
     </div>
