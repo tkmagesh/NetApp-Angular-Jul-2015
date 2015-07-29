@@ -79,6 +79,7 @@
         bugTrackerApp.factory("Bug", function getBugClass(){
             function Bug(defaults){
                 defaults = defaults || {};
+                this.id = defaults.id || Date.now();
                 this.name = defaults.name || '';
                 this.isClosed = defaults.isClosed || false;
                 this.createdAt = defaults.createdAt || new Date();
@@ -139,11 +140,6 @@
                     }
             };
 
-            $scope.getClosedCount = function(){
-                return $scope.bugs.filter(function(bug){
-                    return bug.isClosed;
-                }).length;
-            };
 
             $scope.searchBug = {
                 name : undefined,
@@ -169,6 +165,13 @@
             };
         });
 
+        bugTrackerApp.filter("toClosedCount", function($filter){
+            var builtinFilter = $filter('filter')
+            return function(bugs){
+                return builtinFilter(bugs, {isClosed : true}).length;
+            }
+        });
+
     </script>
 </head>
 <body ng-app="bugTrackerApp">
@@ -176,7 +179,7 @@
     <hr>
     <div class="content" ng-controller="bugsController">
         <div class="stats">
-            <span class="closed">{{getClosedCount()}}</span>
+            <span class="closed">{{ bugs | toClosedCount }}</span>
             /
             <span>{{bugs.length}}</span>
         </div>
