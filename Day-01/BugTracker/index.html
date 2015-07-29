@@ -14,9 +14,12 @@
     5. Display statistics -> done
     6. Search for bugs -> done
     7. Sort the bugs ->
-    8. Improve the bug title display
-    9. Display bug created time
-    10. Save the bugs in the server
+    8. Improve the bug title display -> done
+    9. Display bug created time -> done
+
+    10. Refactor
+
+    11. Save the bugs in the server
     */
     
     </script>
@@ -34,17 +37,48 @@
         div {
             margin-bottom: 5px;
         }
+        div.bugItem{
+            border : 1px solid black;
+            background-color: lightgray;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .timestamp {
+            font-size: small;
+            font-style: italic;
+
+        }
+        ol{
+            list-style: none;
+            width: 60%;
+        }
     </style>
     <script src="angular.js"></script>
+    <script src="moment.js"></script>
+
     <script>
         var bugTrackerApp = angular.module("bugTrackerApp", []);
 
-        bugTrackerApp.controller("bugsController", function($scope){
+        bugTrackerApp.value("Bug", function Bug(defaults){
+            defaults = defaults || {};
+            this.name = defaults.name || '';
+            this.isClosed = defaults.isClosed || false;
+            this.createdAt = defaults.createdAt || new Date();
+        });
+
+        /*Bug.prototype.toggle = function(){
+            this.isClosed = !this.isClosed;
+        };*/
+
+
+
+        bugTrackerApp.controller("bugsController", function($scope, Bug){
+
             $scope.bugs = [
-                {name : "Index out of bounds", isClosed : false},
-                {name : "Object reference not found", isClosed : true},
-                {name : "Server communication failure", isClosed : false},
-                {name : "User authentication failure", isClosed : false},
+                new Bug({name : "Index out of bounds", isClosed : false, createdAt : new Date(2015, 6,29)}),
+                new Bug({name : "Object reference not found", isClosed : true, createdAt : new Date(2015, 5, 27)}),
+                new Bug({name : "Server communication failure", isClosed : false, createdAt : new Date(2015, 6,27)}),
+                new Bug({name : "User authentication failure", isClosed : false, createdAt : new Date(2015, 6,23)}),
             ];
 
             $scope.addBug = function(bugName){
@@ -56,7 +90,7 @@
             };
 
             $scope.toggle = function(bug){
-                bug.isClosed = !bug.isClosed;
+                bug.toggle();
             };
 
             $scope.removeClosed = function(){
@@ -89,6 +123,11 @@
             }
         });
 
+        bugTrackerApp.filter("toMoment", function(){
+            return function(data){
+                return moment(data).fromNow();
+            };
+        });
 
     </script>
 </head>
@@ -117,10 +156,14 @@
             <input type="button" value="Remove Closed" ng-click="removeClosed()">
             <ol>
                 <li
-                    ng-repeat="bug in bugs | filter:filterBug"
-                    ng-class="{closed : bug.isClosed}"
-                    ng-click="toggle(bug)"
-                >{{bug.name | trimText:25}}</li>
+                    ng-repeat="bug in bugs | filter:filterBug">
+                    <div class="bugItem">
+                        <h2 ng-class="{closed : bug.isClosed}"
+                    ng-click="toggle(bug)">{{bug.name}}</h2>
+                        <span class="timestamp">{{bug.createdAt | toMoment}}</span>
+                    </div>
+
+                </li>
             </ol>
         </div>
     </div>
