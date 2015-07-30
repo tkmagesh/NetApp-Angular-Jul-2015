@@ -34,7 +34,7 @@ function addAsyncUsingCallbackClient(x,y){
 
 /* Async - Using Events */
 
-var adder = (function(){
+function getAdder(){
     var callbacks = [];
     return {
         add : function(x,y){
@@ -51,18 +51,39 @@ var adder = (function(){
             callbacks.push(callback);
         }
     }
-})();
+}
 
-
+var adder = getAdder();
 adder.subscribe(function(result){
     console.log("[SC] result = ", result);
 });
 adder.add(100,200);
 
+/* Async - Using Promise */
 
 
+function add(x,y){
+   var promise = new Promise(function(resolve, reject){
+       console.log("[SP] processing the inputs");
+        setTimeout(function(){
+            var result = x + y;
+            console.log("[SP] returning result");
+            resolve(result);
+        },3000);
+   });
+    return promise;
+}
 
 
+//Client
+var promise = add(x,y);
+
+setTimeout(function(){
+    console.log("subscribing to the result AFTER the add operation is completed");
+    promise.then(function(result){
+      console.log("[SC] result = ", result);
+    });
+}, 5000);
 
 
 
