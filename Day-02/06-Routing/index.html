@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Routing</title>
+    <script src="angular.js"></script>
+    <script src="angular-route.js"></script>
+    <script>
+        var myApp = angular.module("myApp", ['ngRoute']);
+        myApp.config(function($routeProvider){
+            $routeProvider
+                .when("/products",{
+                    templateUrl : "templates/productsTemplate.html",
+                    controller : "productsController"
+                })
+                .when("/products/:id", {
+                    templateUrl : "templates/productInfoTemplate.html",
+                    controller : "productInfoController"
+                })
+                .when("/customers", {
+                    templateUrl : "templates/customersTemplate.html"
+                })
+                .otherwise({
+                    redirectTo : "/products"
+                });
+        });
+        myApp.service("productService", function(){
+            this.getAll = function(){
+                return [
+                    {id : 1, name : 'Pen', cost : 10, units : 30, desc : 'Nulla non sed magna fabulas, ipsum sed consequat nam elit. Culpa ab nostrud ut aut varias malis culpa mandaremus de anim aliquip commodo sed tempor ex irure, et expetendis instituendarum nam litteris nisi consequat, nostrud sed labore nostrud hic dolore ab et legam commodo. Ita multos lorem iis fabulas quo o quae hic esse do nescius veniam incididunt et aut se sempiternum. Nostrud eruditionem non litteris se veniam ad quamquam. Proident id illum probant. Quibusdam dolor laboris iis ullamco adipisicing non possumus ita se dolor quid iis nescius ex noster praetermissum deserunt fugiat arbitror, deserunt irure vidisse, ea quo '},
+                    {id : 2, name : 'Hen', cost : 100, units : 15, desc : 'Nulla non sed magna fabulas, ipsum sed consequat nam elit. Culpa ab nostrud ut aut varias malis culpa mandaremus de anim aliquip commodo sed tempor ex irure, et expetendis instituendarum nam litteris nisi consequat, nostrud sed labore nostrud hic dolore ab et legam commodo. Ita multos lorem iis fabulas quo o quae hic esse do nescius veniam incididunt et aut se sempiternum. Nostrud eruditionem non litteris se veniam ad quamquam. Proident id illum probant. Quibusdam dolor laboris iis ullamco adipisicing non possumus ita se dolor quid iis nescius ex noster praetermissum deserunt fugiat arbitror, deserunt irure vidisse, ea quo '},
+                    {id : 3, name : 'Ten', cost : 10, units : 10, desc : 'Nulla non sed magna fabulas, ipsum sed consequat nam elit. Culpa ab nostrud ut aut varias malis culpa mandaremus de anim aliquip commodo sed tempor ex irure, et expetendis instituendarum nam litteris nisi consequat, nostrud sed labore nostrud hic dolore ab et legam commodo. Ita multos lorem iis fabulas quo o quae hic esse do nescius veniam incididunt et aut se sempiternum. Nostrud eruditionem non litteris se veniam ad quamquam. Proident id illum probant. Quibusdam dolor laboris iis ullamco adipisicing non possumus ita se dolor quid iis nescius ex noster praetermissum deserunt fugiat arbitror, deserunt irure vidisse, ea quo '},
+                    {id : 4, name : 'Den', cost : 150, units : 25, desc : 'Nulla non sed magna fabulas, ipsum sed consequat nam elit. Culpa ab nostrud ut aut varias malis culpa mandaremus de anim aliquip commodo sed tempor ex irure, et expetendis instituendarum nam litteris nisi consequat, nostrud sed labore nostrud hic dolore ab et legam commodo. Ita multos lorem iis fabulas quo o quae hic esse do nescius veniam incididunt et aut se sempiternum. Nostrud eruditionem non litteris se veniam ad quamquam. Proident id illum probant. Quibusdam dolor laboris iis ullamco adipisicing non possumus ita se dolor quid iis nescius ex noster praetermissum deserunt fugiat arbitror, deserunt irure vidisse, ea quo '},
+                ]
+            }
+        });
+
+        myApp.controller("productsController", function(productService, $scope){
+            $scope.products = productService.getAll();
+        });
+
+        myApp.controller("productInfoController", function($scope,productService, $routeParams){
+            var productId = parseInt($routeParams.id);
+            $scope.product = productService.getAll().filter(function(p){
+                return p.id === productId
+            })[0];
+        });
+
+    </script>
+</head>
+<body ng-app="myApp">
+    <h1>Routing App</h1>
+        <a href="#/products">Products</a>
+        <a href="#/customers">Customers</a>
+    <hr>
+    <ng-view></ng-view>
+</body>
+</html>

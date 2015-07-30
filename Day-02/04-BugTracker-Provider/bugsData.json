@@ -1,0 +1,34 @@
+{
+  "bugs": [
+    {
+      "id": 1,
+      "name": "Object reference not found",
+      "isClosed": false,
+      "createdAt": "2015-07-30T06:47:43.698Z"
+    },
+    {
+      "id": 2,
+      "name": "Server communication failure",
+      "isClosed": false,
+      "createdAt": "2015-07-27T04:47:43.698Z"
+    },
+    {
+      "id": 3,
+      "name": "User authentication not successful",
+      "isClosed": false,
+      "createdAt": "2015-07-28T02:47:43.698Z"
+    },
+    {
+      "id": 4,
+      "name": "Stack overflow error",
+      "isClosed": false,
+      "createdAt": "2015-07-29T06:47:43.698Z"
+    },
+    {
+      "name": "Bugs are not getting saved",
+      "isClosed": true,
+      "createdAt": "2015-06-09T20:30:00.000Z",
+      "id": 5
+    }
+  ]
+}
