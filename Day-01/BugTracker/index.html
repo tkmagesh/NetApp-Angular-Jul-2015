@@ -109,7 +109,7 @@
             return Bug;
         });
 
-        bugTrackerApp.factory("bugStorage", function(Bug, $window){
+        /*bugTrackerApp.factory("bugStorage", function(Bug, $window){
             var storage = $window.localStorage;
             return {
                 getAll : function(){
@@ -129,6 +129,29 @@
                     storage.removeItem(bug.id);
                 }
             }
+        });
+        */
+
+        bugTrackerApp.service("bugStorage", function(Bug, $window){
+            var storage = $window.localStorage;
+
+                this.getAll = function(){
+                    var result = [];
+                    for(var i=0; i<storage.length; i++){
+                        var key = storage.key(i);
+                        var bugData = angular.fromJson(storage.getItem(key));
+                        var bug = new Bug(bugData);
+                        result.push(bug);
+                    }
+                    return result;
+                },
+                this.save = function(bug){
+                    storage.setItem(bug.id, angular.toJson(bug));
+                },
+                this.remove = function(bug){
+                    storage.removeItem(bug.id);
+                }
+
         });
 
 

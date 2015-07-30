@@ -53,7 +53,9 @@ function add(x,y){
 
 var memoizedAdd = memoize(add);
 
-memoizedAdd(10,20)
-memoizedAdd(100,200)
-memoizedAdd(10,20)
-memoizedAdd(100,200)
+memoizedAdd(10,20);
+memoizedAdd(100,200);
+memoizedAdd(10,20);
+memoizedAdd(100,200);
+
+
