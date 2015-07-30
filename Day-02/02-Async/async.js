@@ -86,6 +86,26 @@ setTimeout(function(){
 }, 5000);
 
 
+/* Using $q */
+
+var injector = angular.injector(['ng']);
+injector.invoke(function($q){
+   function add(x,y){
+      var deferred = $q.defer();
+       console.log("[SP] processing the inputs");
+        setTimeout(function(){
+            var result = x + y;
+            console.log("[SP] returning result");
+            deferred.resolve(result);
+        },3000);
+       return deferred.promise;
+  }
+  add(100,200).then(function(result){
+     console.log("Result = ", result);
+  });
+});
+
+
 
 
 
