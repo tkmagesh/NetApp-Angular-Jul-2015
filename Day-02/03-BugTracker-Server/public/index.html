@@ -109,76 +109,55 @@
             return Bug;
         });
 
-        /*bugTrackerApp.factory("bugStorage", function(Bug, $window){
-            var storage = $window.localStorage;
-            return {
-                getAll : function(){
-                    var result = [];
-                    for(var i=0; i<storage.length; i++){
-                        var key = storage.key(i);
-                        var bugData = angular.fromJson(storage.getItem(key));
-                        var bug = new Bug(bugData);
-                        result.push(bug);
-                    }
-                    return result;
-                },
-                save : function(bug){
-                    storage.setItem(bug.id, angular.toJson(bug));
-                },
-                remove : function(bug){
-                    storage.removeItem(bug.id);
-                }
+        bugTrackerApp.service("bugService", function(Bug, $http, $q){
+            this.getAll = function(){
+                 var deferred = $q.defer();
+                $http.get("http://localhost:3000/bugs").then(function(response){
+                    var result = response.data.map(function(bugData){
+                        return new Bug(bugData);
+                    });
+                    deferred.resolve(result);
+                });
+
+                return deferred.promise;
             }
-        });
-        */
-
-        bugTrackerApp.service("bugStorage", function(Bug, $window){
-            var storage = $window.localStorage;
-
-                this.getAll = function(){
-                    var result = [];
-                    for(var i=0; i<storage.length; i++){
-                        var key = storage.key(i);
-                        var bugData = angular.fromJson(storage.getItem(key));
-                        var bug = new Bug(bugData);
-                        result.push(bug);
-                    }
-                    return result;
-                },
-                this.save = function(bug){
-                    storage.setItem(bug.id, angular.toJson(bug));
-                },
-                this.remove = function(bug){
-                    storage.removeItem(bug.id);
-                }
-
-        });
+        })
 
 
-        bugTrackerApp.controller("bugsController", function($scope, Bug, bugStorage){
+        bugTrackerApp.controller("bugsController", function($scope, Bug, bugService){
 
-            $scope.bugs = bugStorage.getAll();
+            $scope.bugs = [];
+
+            bugService.getAll().then(function(bugs){
+                console.log(bugs);
+                $scope.bugs = bugs;
+            });
 
             $scope.addBug = function(bugName){
                 var newBug = new Bug({
                     name : bugName,
                     isClosed : false
                 });
-                bugStorage.save(newBug);
+
                 $scope.bugs.push(newBug);
             };
 
             $scope.toggle = function(bug){
                 bug.toggle();
-                bugStorage.save(bug);
+
             };
 
             $scope.removeClosed = function(){
                 for(var i=$scope.bugs.length-1; i>=0; i--)
                     if ($scope.bugs[i].isClosed){
-                        bugStorage.remove($scope.bugs[i]);
+
                         $scope.bugs.splice(i,1);
                     }
+            };
+
+            $scope.searchBug = {
+                name : '',
+                isOpen : undefined
             };
 
         });
